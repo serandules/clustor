@@ -1,5 +1,6 @@
 var log = require('logger')('clustor');
 var cluster = require('cluster');
+var procevent = require('procevent');
 
 var cpus = require('os').cpus().length;
 
@@ -12,33 +13,40 @@ module.exports = function (domain, run, done, forks) {
         return run();
     }
     forks = forks || cpus;
+    var address;
+    var listening = forks;
+    var starting = forks;
     var i;
-    for (i = 0; i < forks; i++) {
-        cluster.fork();
+    for (i = 0; i < listening; i++) {
+        (function () {
+            var worker = cluster.fork();
+            var pevent = procevent(worker.process);
+            pevent.once('started', function () {
+                log.debug('worker started');
+                pevent.destroy();
+                if (--starting > 0) {
+                    return;
+                }
+                log.debug('all workers started');
+                var master = procevent(process);
+                master.emit('started', process.pid, address.port);
+                master.destroy();
+                log.debug(JSON.stringify(address));
+                done(false, address);
+            });
+        }());
     }
     cluster.on('exit', function (worker, code, signal) {
-        if (log.debug) {
-            log.debug('%s worker %s stopped (%s)', domain, worker.process.pid, signal || code);
-            log.debug('%s worker restarting', domain);
-        }
-        cluster.fork();
+        log.debug('worker stopped | domain:%s, pid:%s, signal:%s, code:%s', domain, worker.process.pid, signal, code);
+        //log.debug('%s worker restarting', domain);
+        //cluster.fork();
     });
-    cluster.on('listening', function (worker, address) {
-        if (log.debug) {
-            log.debug('worker started');
-        }
-        if (--forks > 0) {
+    cluster.on('listening', function (worker, addrezz) {
+        log.debug('worker listening');
+        if (--listening > 0) {
             return;
         }
-        if (log.debug) {
-            log.debug('all workers started');
-        }
-        done(false, address);
+        address = addrezz;
+        log.debug('all workers listening');
     });
 };
-
-/*
-process.on('uncaughtException', function (err) {
-    log.fatal('unhandled exception %s', err);
-    log.trace(err.stack);
-});*/
