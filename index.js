@@ -29,7 +29,7 @@ module.exports = function (domain, run, done, forks) {
                 }
                 log.debug('all workers started');
                 var master = procevent(process);
-                master.emit('started', process.pid, address.port);
+                master.emit('started', address.port);
                 master.destroy();
                 log.debug(JSON.stringify(address));
                 done(false, address);
