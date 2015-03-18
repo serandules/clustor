@@ -3,6 +3,19 @@ var cluster = require('cluster');
 var procevent = require('procevent');
 
 var cpus = require('os').cpus().length;
+cpus = 1;
+
+var end = function (starting, listening, address, done) {
+    if (starting > 0 || listening > 0) {
+        return;
+    }
+    log.debug('all workers started');
+    var master = procevent(process);
+    master.emit('started', address.port);
+    master.destroy();
+    log.debug(JSON.stringify(address));
+    done(false, address);
+};
 
 module.exports = function (run, done, forks) {
     if (typeof done !== 'function') {
@@ -24,15 +37,7 @@ module.exports = function (run, done, forks) {
             pevent.once('started', function () {
                 log.debug('worker started');
                 pevent.destroy();
-                if (--starting > 0) {
-                    return;
-                }
-                log.debug('all workers started');
-                var master = procevent(process);
-                master.emit('started', address.port);
-                master.destroy();
-                log.debug(JSON.stringify(address));
-                done(false, address);
+                end(--starting, listening, address, done);
             });
         }());
     }
@@ -43,10 +48,7 @@ module.exports = function (run, done, forks) {
     });
     cluster.on('listening', function (worker, addrezz) {
         log.debug('worker listening');
-        if (--listening > 0) {
-            return;
-        }
-        address = addrezz;
-        log.debug('all workers listening');
+        address = address || addrezz;
+        end(starting, --listening, address, done);
     });
 };
