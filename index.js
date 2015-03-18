@@ -4,7 +4,7 @@ var procevent = require('procevent');
 
 var cpus = require('os').cpus().length;
 
-module.exports = function (domain, run, done, forks) {
+module.exports = function (run, done, forks) {
     if (typeof done !== 'function') {
         forks = done;
         done = null;
@@ -37,7 +37,7 @@ module.exports = function (domain, run, done, forks) {
         }());
     }
     cluster.on('exit', function (worker, code, signal) {
-        log.debug('worker stopped | domain:%s, pid:%s, signal:%s, code:%s', domain, worker.process.pid, signal, code);
+        log.debug('worker stopped | pid:%s, signal:%s, code:%s', worker.process.pid, signal, code);
         //log.debug('%s worker restarting', domain);
         //cluster.fork();
     });
