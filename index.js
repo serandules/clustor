@@ -3,7 +3,6 @@ var cluster = require('cluster');
 var procevent = require('procevent');
 
 var cpus = require('os').cpus().length;
-cpus = 1;
 
 var end = function (starting, listening, address, done) {
     if (starting > 0 || listening > 0) {
