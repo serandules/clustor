@@ -1,3 +1,9 @@
 {
-    "name": "clustor"
+    "name": "clustor",
+    "version": "0.0.0",
+    "description": "accounts",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/serandules/cluster.git"
+    }
 }
