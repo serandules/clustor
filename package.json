@@ -2,6 +2,9 @@
     "name": "clustor",
     "version": "0.0.0",
     "description": "accounts",
+    "dependencies": {
+        "logger": "serandules/logger#master"
+    },
     "repository": {
         "type": "git",
         "url": "git://github.com/serandules/cluster.git"
