@@ -3,12 +3,10 @@
     "version": "0.0.0",
     "description": "accounts",
     "dependencies": {
-        "logger": "serandules/logger#master",
-        "clustor": "serandules/clustor#master",
-        "procevent": "serandules/procevent#master"
+        "logger": "serandules/logger#master"
     },
     "repository": {
         "type": "git",
-        "url": "git://github.com/serandules/cluster.git"
+        "url": "git://github.com/serandules/clustor.git"
     }
 }
